@@ -20,17 +20,21 @@ import java.security.cert.X509Certificate;
  */
 public class TimestampingAuthority {
 
-    private X509Certificate certificate;
-    private PrivateKey privateKey;
+    private final CertificateProvider certificateProvider;
+    private final KeyProvider keyProvider;
 
-    public TimestampingAuthority(X509Certificate certificate, PrivateKey privateKey) {
-        this.certificate = certificate;
-        this.privateKey = privateKey;
+    public TimestampingAuthority(CertificateProvider certificateProvider, KeyProvider keyProvider) {
+        this.certificateProvider = certificateProvider;
+        this.keyProvider = keyProvider;
     }
 
     public byte[] sign(byte[] data) throws GeneralSecurityException, CMSException, IOException, OperatorCreationException {
         Security.addProvider(new BouncyCastleProvider());
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+
+        X509Certificate certificate = certificateProvider.getCertificate();
+        PrivateKey privateKey = keyProvider.getPrivateKey();
+
         generator.addCertificate(new X509CertificateHolder(certificate.getEncoded()));
         ContentSigner signer = new JcaContentSignerBuilder("SHA512withRSA").setProvider(BouncyCastleProvider.PROVIDER_NAME).build(privateKey);
 

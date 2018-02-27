@@ -9,11 +9,28 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.4.RELEASE"
+    }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+dependencyManagement {
+    imports {
+        mavenBom 'software.amazon.awssdk:bom:2.0.0-preview-8'
+    }
+}
+
 dependencies {
+    compile group: 'software.amazon.awssdk', name: 'kms'
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.59'
     compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.59'
     testCompile group: 'junit', name: 'junit', version: '4.12'

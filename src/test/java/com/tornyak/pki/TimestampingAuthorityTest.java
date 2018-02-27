@@ -31,16 +31,6 @@ public class TimestampingAuthorityTest {
 
     private static final String TEXT = "THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG'S BACK 1234567890";
 
-    @Test
-    public void sign() throws Exception {
-        KeyPair keyPair = generateKeyPair();
-        X509Certificate cert = createCertificate(keyPair);
-        TimestampingAuthority ta = new TimestampingAuthority(cert, keyPair.getPrivate());
-        byte[] signedData = ta.sign(generateHash());
-        assertNotNull(signedData);
-        System.out.println(new String(Hex.encode(signedData)));
-    }
-
     private static byte[] generateHash() throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-512");
         return digest.digest(TEXT.getBytes(StandardCharsets.UTF_8));
@@ -63,4 +53,17 @@ public class TimestampingAuthorityTest {
         keyGen.initialize(1024);
         return keyGen.generateKeyPair();
     }
+
+    @Test
+    public void sign() throws Exception {
+        KeyPair keyPair = generateKeyPair();
+        X509Certificate cert = createCertificate(keyPair);
+        TimestampingAuthority ta = new TimestampingAuthority(new TestCertificateProvider(cert), new TestKeyProvider(keyPair) {
+        });
+        byte[] signedData = ta.sign(generateHash());
+        assertNotNull(signedData);
+        System.out.println(new String(Hex.encode(signedData)));
+    }
+
+
 }
